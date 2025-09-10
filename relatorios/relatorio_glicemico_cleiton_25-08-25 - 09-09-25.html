@@ -1,0 +1,1549 @@
+<html lang="pt-BR"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Controle Glicêmico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        .pdf-page {
+            page-break-before: always;
+            page-break-inside: avoid;
+        }
+        @media print { 
+            html, body { 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+                font-size: 8pt;
+            } 
+            .no-print { display: none !important; }
+            #report-content > .pdf-page:first-of-type {
+                page-break-before: auto;
+            }
+            .pdf-day-container {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 0.5rem !important;
+            }
+            .pdf-day-glicemias { flex: 0 0 45%; }
+            .pdf-day-refeicoes { flex: 0 0 55%; }
+            h1, h2, h3, h4, p, li, span, div {
+                font-size: inherit !important;
+                padding: 0.1rem !important;
+                margin: 0 !important;
+                line-height: 1.1 !important;
+            }
+            ul { padding-left: 1rem !important; }
+            .shadow-md { box-shadow: none !important; border: 1px solid #eee; }
+            .rounded-lg { border-radius: 4px !important; }
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.mx-2{margin-left:0.5rem;margin-right:0.5rem}.mx-auto{margin-left:auto;margin-right:auto}.my-4{margin-top:1rem;margin-bottom:1rem}.-mt-1{margin-top:-0.25rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-8{margin-bottom:2rem}.ml-1{margin-left:0.25rem}.mr-1{margin-right:0.25rem}.mt-2{margin-top:0.5rem}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-3{height:0.75rem}.h-8{height:2rem}.h-\[600px\]{height:600px}.w-3{width:0.75rem}.w-full{width:100%}.list-inside{list-style-position:inside}.list-disc{list-style-type:disc}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.items-baseline{align-items:baseline}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-b-lg{border-bottom-right-radius:0.5rem;border-bottom-left-radius:0.5rem}.rounded-t-lg{border-top-left-radius:0.5rem;border-top-right-radius:0.5rem}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-gray-300\/50{border-color:rgb(209 213 219 / 0.5)}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-gray-600{--tw-bg-opacity:1;background-color:rgb(75 85 99 / var(--tw-bg-opacity, 1))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-green-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.bg-red-100{--tw-bg-opacity:1;background-color:rgb(254 226 226 / var(--tw-bg-opacity, 1))}.bg-red-500{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.bg-sky-100{--tw-bg-opacity:1;background-color:rgb(224 242 254 / var(--tw-bg-opacity, 1))}.bg-sky-500{--tw-bg-opacity:1;background-color:rgb(14 165 233 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-4{padding-left:1rem;padding-right:1rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.pl-2{padding-left:0.5rem}.pt-2{padding-top:0.5rem}.text-right{text-align:right}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-semibold{font-weight:600}.italic{font-style:italic}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-purple-600{--tw-text-opacity:1;color:rgb(147 51 234 / var(--tw-text-opacity, 1))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.text-sky-500{--tw-text-opacity:1;color:rgb(14 165 233 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-700:hover{--tw-bg-opacity:1;background-color:rgb(55 65 81 / var(--tw-bg-opacity, 1))}.hover\:bg-green-700:hover{--tw-bg-opacity:1;background-color:rgb(21 128 61 / var(--tw-bg-opacity, 1))}@media (min-width: 640px){.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:p-6{padding:1.5rem}}@media (min-width: 768px){.md\:p-8{padding:2rem}.md\:text-4xl{font-size:2.25rem;line-height:2.5rem}}@media (min-width: 1024px){.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:col-span-3{grid-column:span 3 / span 3}.lg\:grid-cols-5{grid-template-columns:repeat(5, minmax(0, 1fr))}}@media print{.print\:hidden{display:none}}</style><style>.vue-notification-group{display:block;position:fixed;z-index:5000}.vue-notification-wrapper{display:block;overflow:hidden;width:100%;margin:0;padding:0}.notification-title{font-weight:600}.vue-notification-template{display:block;box-sizing:border-box;background:#fff;text-align:left}.vue-notification{display:block;box-sizing:border-box;text-align:left;font-size:12px;padding:10px;margin:0 5px 5px;color:#fff;background:#44a4fc;border-left:5px solid #187FE7}.vue-notification.warn{background:#ffb648;border-left-color:#f48a06}.vue-notification.error{background:#e54d42;border-left-color:#b82e24}.vue-notification.success{background:#68cd86;border-left-color:#42a85f}.vn-fade-enter-active,.vn-fade-leave-active,.vn-fade-move{transition:all .5s}.vn-fade-enter-from,.vn-fade-leave-to{opacity:0}</style><style>.vue-notification-group{display:block;position:fixed;z-index:5000}.vue-notification-wrapper{display:block;overflow:hidden;width:100%;margin:0;padding:0}.notification-title{font-weight:600}.vue-notification-template{display:block;box-sizing:border-box;background:#fff;text-align:left}.vue-notification{display:block;box-sizing:border-box;text-align:left;font-size:12px;padding:10px;margin:0 5px 5px;color:#fff;background:#44a4fc;border-left:5px solid #187FE7}.vue-notification.warn{background:#ffb648;border-left-color:#f48a06}.vue-notification.error{background:#e54d42;border-left-color:#b82e24}.vue-notification.success{background:#68cd86;border-left-color:#42a85f}.vn-fade-enter-active,.vn-fade-leave-active,.vn-fade-move{transition:all .5s}.vn-fade-enter-from,.vn-fade-leave-to{opacity:0}</style><link type="text/css" rel="stylesheet" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"><link type="text/css" rel="stylesheet" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"></head>
+<body class="bg-gray-100 text-gray-800">
+    <div id="report-content" class="container mx-auto p-4 sm:p-6 md:p-8">
+        <header class="mb-8 flex flex-wrap justify-between items-center gap-4 no-print">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-blue-700">Relatório de Controle Glicêmico</h1>
+                <p class="text-md text-gray-600">Paciente: Cleiton | Período: 25/08/25 - 09/09/25</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="/" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700">Carregar Novo</a>
+                <button onclick="saveReportToServer(this)" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700" disabled="">Salvando...</button>
+                <button onclick="exportToPDF()" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Exportar para PDF</button>
+            </div>
+        </header>
+
+        <div class="pdf-page">
+            <div id="pdf-header" class="hidden">
+                 <h1 class="text-3xl md:text-4xl font-bold text-blue-700">Relatório de Controle Glicêmico</h1>
+                <p class="text-md text-gray-600 mb-8">Paciente: Cleiton | Período: 25/08/25 - 09/09/25</p>
+            </div>
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-700">Resumo Geral</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md" title="A média de todas as medições de glicose no período."><h3 class="font-semibold text-gray-500">Glicemia Média</h3><p class="text-4xl font-bold text-blue-600">196 <span class="text-lg">mg/dL</span></p></div>
+                    <div class="bg-white p-6 rounded-lg shadow-md" title="Estimativa da Hemoglobina Glicada (A1c) baseada na glicemia média. Fórmula: (Glicemia Média + 46.7) / 28.7."><h3 class="font-semibold text-gray-500">HbA1c Estimada</h3><p class="text-4xl font-bold text-green-600">8.5<span class="text-lg">%</span></p></div>
+                    <div class="bg-white p-6 rounded-lg shadow-md" title="Desvio Padrão (DP). Um valor mais baixo indica maior estabilidade glicêmica."><h3 class="font-semibold text-gray-500">Variabilidade (DP)</h3><p class="text-4xl font-bold text-purple-600">80.6</p></div>
+                    <div class="bg-white p-6 rounded-lg shadow-md" title="O valor mais alto e o mais baixo registrados."><h3 class="font-semibold text-gray-500">Medições Extremas</h3><div class="flex items-baseline"><p class="text-2xl font-bold text-red-500">365</p><span class="mx-2 text-gray-400">/</span><p class="text-2xl font-bold text-sky-500">61</p><span class="text-sm ml-1">mg/dL</span></div></div>
+                    <div class="bg-white p-6 rounded-lg shadow-md" title="O número total de dias com registros no relatório."><h3 class="font-semibold text-gray-500">Total de Dias</h3><p class="text-4xl font-bold text-gray-600">15</p></div>
+                </div>
+            </section>
+             <section class="mb-8">
+                 <h2 class="text-2xl font-semibold mb-4 text-gray-700">Glicemia Alvo</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="w-full bg-gray-200 rounded-full h-8 flex overflow-hidden">
+                        <div class="bg-sky-500 h-8 flex items-center justify-center text-white font-bold" style="width: 5%" title="Abaixo do Alvo">5%</div>
+                        <div class="bg-green-500 h-8 flex items-center justify-center text-white font-bold" style="width: 38%" title="No Alvo">38%</div>
+                        <div class="bg-red-500 h-8 flex items-center justify-center text-white font-bold" style="width: 57%" title="Acima do Alvo">57%</div>
+                    </div>
+                    <div class="flex justify-between mt-2 text-sm text-gray-600">
+                        <span><span class="inline-block w-3 h-3 bg-sky-500 rounded-full mr-1"></span>&lt;70</span>
+                        <span><span class="inline-block w-3 h-3 bg-green-500 rounded-full mr-1"></span>70-180</span>
+                        <span><span class="inline-block w-3 h-3 bg-red-500 rounded-full mr-1"></span>&gt;180</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div class="pdf-page">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-700">Tendência Glicêmica</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md h-[600px]">
+                <canvas id="glucoseChart" width="1424" height="552" style="display: block; box-sizing: border-box; height: 552px; width: 1424px;"></canvas>
+            </div>
+        </div>
+
+        <section>
+            <h2 class="text-2xl font-semibold my-4 text-gray-700 print:hidden">Registros Detalhados por Dia</h2>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">25 de Agosto de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 1518.0 kcals / 177.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">28 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">08:16 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">214 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (36.0g / 15.0 = 2UI) + Correção (214mg/dL = 4UI) = 6UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">12:05 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">260 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 10 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (76.0g / 15.0 = 5UI) + Correção (260mg/dL = 5UI) = 10UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">20:06 (Antes do jantar)</span><span class="font-bold text-gray-800 text-lg">109 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 3 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (36.0g / 15.0 = 2UI) + Correção (109mg/dL = 1UI) = 3UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">22:42 (Depois do jantar)</span><span class="font-bold text-gray-800 text-lg">253 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 5 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 253mg/dL = 5UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">23:60 (Depois do jantar)</span><span class="font-bold text-gray-800 text-lg">225 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 4 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 225mg/dL = 4UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">365.0 kcals / 36.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Pão francês <span class="text-gray-500">(1x 1 unidade (50g) 135 kcals / 29 carbs)</span></li>
+                                
+                                    <li>Ovo de galinha inteiro (cozido) <span class="text-gray-500">(2x 1 unidade média (90g) 142 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Café com leite sem açúcar <span class="text-gray-500">(1x 1 xícara de chá cheia (200ml) 88 kcals / 7 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">186.0 kcals / 36.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(2x 1 colher de sopa cheia (34g) 38 kcals / 6 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(2x 1 colher de servir arroz (90g) 148 kcals / 30 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Ceia</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">194.0 kcals / 5.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Amendoim, torrado, salgado <span class="text-gray-500">(1x 2 colheres de sopa (34g) 194 kcals / 5 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">417.0 kcals / 31.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(2x 1 colher de sopa cheia (34g) 38 kcals / 6 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(3x 1 colher de sopa cheia (60g) 78 kcals / 18 carbs)</span></li>
+                                
+                                    <li>Carne assada <span class="text-gray-500">(1x 1 fatia média (90g) 259 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Macarrão com molho de tomate <span class="text-gray-500">(35 gramas 42 kcals / 7 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">398.0 kcals / 76.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Alface, lisa, crua <span class="text-gray-500">(3x 1 folha média (30g) 3 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(1x 1 colher de sopa cheia (17g) 19 kcals / 3 carbs)</span></li>
+                                
+                                    <li>Macarrão à bolonhesa <span class="text-gray-500">(1x 1 escumadeira cheia (110g) 135 kcals / 25 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(1x 1 colher de sopa cheia (17g) 19 kcals / 3 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(3x 1 colher de servir arroz (135g) 222 kcals / 45 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">26 de Agosto de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 1016.0 kcals / 125.2g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">31 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">07:31 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">102 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 3 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (23.200000000000003g / 15.0 = 2UI) + Correção (102mg/dL = 1UI) = 3UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">11:24 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">178 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (44.0g / 15.0 = 3UI) + Correção (178mg/dL = 3UI) = 6UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">12:39 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">201 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (44.0g / 15.0 = 3UI) + Correção (201mg/dL = 3UI) = 6UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">15:58 (Depois do almoço)</span><span class="font-bold text-gray-800 text-lg">282 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 282mg/dL = 6UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">19:45 (Antes do jantar)</span><span class="font-bold text-gray-800 text-lg">116 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 5 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (58.0g / 15.0 = 4UI) + Correção (116mg/dL = 1UI) = 5UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">22:13 (Depois do jantar)</span><span class="font-bold text-gray-800 text-lg">245 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 5 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 245mg/dL = 5UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">179.0 kcals / 23.2g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Ovo de galinha inteiro (cozido) <span class="text-gray-500">(1x 1 unidade média (45g) 71 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Pão francês <span class="text-gray-500">(0.8x 1 unidade (40g) 108 kcals / 23 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">340.0 kcals / 44.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Strogonoff de frango <span class="text-gray-500">(2x 1 colher de sopa cheia (50g) 76 kcals / 2 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(2x 1 colher de sopa cheia (34g) 38 kcals / 6 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(2x 1 colher de servir arroz (90g) 148 kcals / 30 carbs)</span></li>
+                                
+                                    <li>Batata palha <span class="text-gray-500">(1x Colher de sopa cheia (13g) 78 kcals / 6 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">497.0 kcals / 58.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(8x 1 colher de sopa cheia (160g) 208 kcals / 48 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(3x 1 colher de sopa cheia (51g) 57 kcals / 9 carbs)</span></li>
+                                
+                                    <li>Ovo de galinha inteiro (cozido) <span class="text-gray-500">(2x 1 unidade média (90g) 142 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Linguiça toscana <span class="text-gray-500">(1x 1/2 unidade (50g) 90 kcals / 1 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">27 de Agosto de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 2725.4 kcals / 375.5g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">51 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">07:39 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">88 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 8 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (121.0g / 15.0 = 8UI) + Correção (88mg/dL = 0UI) = 8UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">09:15 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">252 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 13 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (121.0g / 15.0 = 8UI) + Correção (252mg/dL = 5UI) = 13UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">12:10 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">216 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 9 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (75.5g / 15.0 = 5UI) + Correção (216mg/dL = 4UI) = 9UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">15:29 (Antes do lanche da tarde)</span><span class="font-bold text-gray-800 text-lg">183 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 5 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (32.0g / 15.0 = 2UI) + Correção (183mg/dL = 3UI) = 5UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">19:25 (Antes do jantar)</span><span class="font-bold text-gray-800 text-lg">189 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 10 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (104.0g / 15.0 = 7UI) + Correção (189mg/dL = 3UI) = 10UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">22:44 (Depois do jantar)</span><span class="font-bold text-gray-800 text-lg">146 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 2 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 146mg/dL = 2UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">23:60 (Depois do jantar)</span><span class="font-bold text-gray-800 text-lg">208 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 4 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 208mg/dL = 4UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">934.0 kcals / 104.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(4x 1 concha média rasa (320g) 356 kcals / 56 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(3x 1 colher de servir arroz (135g) 222 kcals / 45 carbs)</span></li>
+                                
+                                    <li>Costela de porco cozida <span class="text-gray-500">(3x 1 pedaço médio (75g) 300 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Legumes refogados <span class="text-gray-500">(1x 1 colher de servir cheia (60g) 56 kcals / 3 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">769.0 kcals / 121.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Biscoito de água e sal <span class="text-gray-500">(8x 1 unidade (64g) 272 kcals / 40 carbs)</span></li>
+                                
+                                    <li>Achocolatado Diet Gold ® <span class="text-gray-500">(1x 1 colher de sopa (5g) 11 kcals / 3 carbs)</span></li>
+                                
+                                    <li>Bolinho de Chuva <span class="text-gray-500">(6x 1 unidade pequena (180g) 486 kcals / 78 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Lanche da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">188.0 kcals / 32.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Mortadela <span class="text-gray-500">(1x 1 fatia (20g) 53 kcals / 3 carbs)</span></li>
+                                
+                                    <li>Pão francês <span class="text-gray-500">(1x 1 unidade (50g) 135 kcals / 29 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">442.4 kcals / 75.5g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Suco de acerola com açúcar <span class="text-gray-500">(0.7x 1 copo duplo cheio (168ml) 43 kcals / 11 carbs)</span></li>
+                                
+                                    <li>Farofa com linguiça <span class="text-gray-500">(1x 1 colher de arroz cheia (45g) 162 kcals / 21 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(1x 1 concha média rasa (80g) 89 kcals / 14 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(2x 1 colher de servir arroz (90g) 148 kcals / 30 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Lanche da tarde</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">327.0 kcals / 33.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Pão de queijo <span class="text-gray-500">(3x 1 unidade tradicional (75g) 327 kcals / 33 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Ceia</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">65.0 kcals / 10.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Biscoito de polvilho (rosquinha) <span class="text-gray-500">(5x 1 unidade (15g) 65 kcals / 10 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">28 de Agosto de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 1478.6 kcals / 206.8g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">10 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">20:20 (Antes do jantar)</span><span class="font-bold text-gray-800 text-lg">210 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 10 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (91.8g / 15.0 = 6UI) + Correção (210mg/dL = 4UI) = 10UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">576.6 kcals / 91.8g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Legumes refogados <span class="text-gray-500">(0.6x 1 colher de servir cheia (36g) 34 kcals / 2 carbs)</span></li>
+                                
+                                    <li>Couve manteiga refogada <span class="text-gray-500">(3x 1 colher de sopa (60g) 54 kcals / 3 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(3x 1 colher de servir arroz (135g) 222 kcals / 45 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(3x 1 concha média rasa (240g) 267 kcals / 42 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">442.0 kcals / 65.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Biscoito de água e sal <span class="text-gray-500">(13x 1 unidade (104g) 442 kcals / 65 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">553.0 kcals / 73.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Beterraba cozida (picada) <span class="text-gray-500">(3x 1 colher de sopa cheia (60g) 27 kcals / 6 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(1x 1 concha média rasa (80g) 89 kcals / 14 carbs)</span></li>
+                                
+                                    <li>Suco de abacaxi com açúcar <span class="text-gray-500">(200 gramas 93 kcals / 23 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(2x 1 colher de servir arroz (90g) 148 kcals / 30 carbs)</span></li>
+                                
+                                    <li>Carne de boi moída <span class="text-gray-500">(4x 1 Colher de Sopa cheia (100g) 196 kcals / 0 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">29 de Agosto de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 2147.0 kcals / 215.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">17 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">08:15 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">130 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 3 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (35.0g / 15.0 = 2UI) + Correção (130mg/dL = 1UI) = 3UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">12:58 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">207 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 10 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (96.0g / 15.0 = 6UI) + Correção (207mg/dL = 4UI) = 10UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-sky-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">22:16 (Antes do jantar)</span><span class="font-bold text-gray-800 text-lg">67 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 4 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (64.0g / 15.0 = 4UI) + Correção (67mg/dL = 0UI) = 4UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">888.0 kcals / 64.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Omelete <span class="text-gray-500">(2x 1 ovo (130g) 220 kcals / 4 carbs)</span></li>
+                                
+                                    <li>Biscoito de água e sal <span class="text-gray-500">(12x 1 unidade (96g) 408 kcals / 60 carbs)</span></li>
+                                
+                                    <li>Queijo Muçarela <span class="text-gray-500">(4x 1 fatia média (80g) 260 kcals / 0 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">371.0 kcals / 35.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Coca-Cola Zero® <span class="text-gray-500">(1x 1 copo (200ml) 0 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Queijo Muçarela <span class="text-gray-500">(2x 1 fatia média (40g) 130 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Pão francês <span class="text-gray-500">(1x 1 unidade (50g) 135 kcals / 29 carbs)</span></li>
+                                
+                                    <li>Mortadela <span class="text-gray-500">(2x 1 fatia (40g) 106 kcals / 6 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">562.0 kcals / 96.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Frango assado <span class="text-gray-500">(1x 1 sobrecoxa média (65g) 78 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(2x 1 concha média rasa (160g) 178 kcals / 28 carbs)</span></li>
+                                
+                                    <li>Doce de banana em barra <span class="text-gray-500">(1x 1 fatia pequena (30g) 84 kcals / 23 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(3x 1 colher de servir arroz (135g) 222 kcals / 45 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Ceia</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">326.0 kcals / 20.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Hamburguer industrializado de carne bovina grelhado <span class="text-gray-500">(2x 1 unidade (112g) 326 kcals / 20 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">30 de Agosto de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 1216.0 kcals / 193.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">14 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">09:23 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">108 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (70.0g / 15.0 = 5UI) + Correção (108mg/dL = 1UI) = 6UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-sky-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">15:05 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">63 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 5 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (73.0g / 15.0 = 5UI) + Correção (63mg/dL = 0UI) = 5UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">23:01 (Antes do jantar)</span><span class="font-bold text-gray-800 text-lg">193 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 3 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (0g / 15.0 = 0UI) + Correção (193mg/dL = 3UI) = 3UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">476.0 kcals / 70.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Biscoito de água e sal <span class="text-gray-500">(14x 1 unidade (112g) 476 kcals / 70 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">400.0 kcals / 73.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(2x 1 concha média rasa (160g) 178 kcals / 28 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(3x 1 colher de servir arroz (135g) 222 kcals / 45 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Lanche da tarde</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">340.0 kcals / 50.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Biscoito de água e sal <span class="text-gray-500">(10x 1 unidade (80g) 340 kcals / 50 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">31 de Agosto de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 1469.0 kcals / 212.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">30 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">08:20 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">170 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 4 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (30.0g / 15.0 = 2UI) + Correção (170mg/dL = 2UI) = 4UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">13:46 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">198 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 7 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (66.0g / 15.0 = 4UI) + Correção (198mg/dL = 3UI) = 7UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">17:34 (Depois do almoço)</span><span class="font-bold text-gray-800 text-lg">155 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 2 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 155mg/dL = 2UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">19:29 (Antes do jantar)</span><span class="font-bold text-gray-800 text-lg">257 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 9 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (56.0g / 15.0 = 4UI) + Correção (257mg/dL = 5UI) = 9UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">23:37 (Antes do jantar)</span><span class="font-bold text-gray-800 text-lg">78 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 4 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (56.0g / 15.0 = 4UI) + Correção (78mg/dL = 0UI) = 4UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">23:56 (Depois do jantar)</span><span class="font-bold text-gray-800 text-lg">234 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 4 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 234mg/dL = 4UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Refeição extra</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">336.0 kcals / 60.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Purê de batata <span class="text-gray-500">(3x 1 colher de sopa cheia (135g) 168 kcals / 24 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(5x 1 colher de sopa cheia (100g) 130 kcals / 30 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(2x 1 colher de sopa cheia (34g) 38 kcals / 6 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">450.0 kcals / 30.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Pastel de queijo <span class="text-gray-500">(6x 1 unidade média (150g) 450 kcals / 30 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">389.0 kcals / 66.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Purê de batata <span class="text-gray-500">(1x 1 concha (140g) 152 kcals / 22 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(1x 1 concha média rasa (80g) 89 kcals / 14 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(2x 1 colher de servir arroz (90g) 148 kcals / 30 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">294.0 kcals / 56.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Bolo de brigadeiro Dona Benta ® <span class="text-gray-500">(2x 1 fatia média (120g) 294 kcals / 56 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">1 de Setembro de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 871.0 kcals / 157.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">20 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">08:08 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">83 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 2 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (28.0g / 15.0 = 2UI) + Correção (83mg/dL = 0UI) = 2UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">12:51 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">223 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 11 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (110.0g / 15.0 = 7UI) + Correção (223mg/dL = 4UI) = 11UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">18:34 (Depois do almoço)</span><span class="font-bold text-gray-800 text-lg">332 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 7 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 332mg/dL = 7UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">147.0 kcals / 28.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Bolo de brigadeiro Dona Benta ® <span class="text-gray-500">(1x 1 fatia média (60g) 147 kcals / 28 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">147.0 kcals / 28.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Bolo de brigadeiro Dona Benta ® <span class="text-gray-500">(1x 1 fatia média (60g) 147 kcals / 28 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">636.0 kcals / 110.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(3x 1 colher de servir arroz (135g) 222 kcals / 45 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(1x 1 concha média rasa (80g) 89 kcals / 14 carbs)</span></li>
+                                
+                                    <li>Feijão tropeiro <span class="text-gray-500">(90 gramas 265 kcals / 42 carbs)</span></li>
+                                
+                                    <li>Brigadeiro <span class="text-gray-500">(1x 1 unidade pequena (15g) 60 kcals / 9 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">2 de Setembro de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 1690.0 kcals / 259.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">26 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">07:44 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">151 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 7 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (70.0g / 15.0 = 5UI) + Correção (151mg/dL = 2UI) = 7UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">12:15 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">358 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 13 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (68.0g / 15.0 = 5UI) + Correção (358mg/dL = 8UI) = 13UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">17:07 (Depois do lanche da tarde)</span><span class="font-bold text-gray-800 text-lg">297 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 297mg/dL = 6UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-sky-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">23:34 (Depois do jantar)</span><span class="font-bold text-gray-800 text-lg">61 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 0 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 61mg/dL = 0UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">773.0 kcals / 121.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Salsicha Comum  <span class="text-gray-500">(1x 1 unidade  (50g) 104 kcals / 1 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(9x 1 colher de sopa cheia (180g) 234 kcals / 54 carbs)</span></li>
+                                
+                                    <li>Purê de batata <span class="text-gray-500">(3x 1 colher de sopa cheia (135g) 168 kcals / 24 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(3x 1 concha média rasa (240g) 267 kcals / 42 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">506.0 kcals / 70.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Pão de batata-inglesa <span class="text-gray-500">(2x 1 unidade média (100g) 274 kcals / 58 carbs)</span></li>
+                                
+                                    <li>Queijo Muçarela <span class="text-gray-500">(2x 1 fatia média (40g) 130 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Biscoito de queijo <span class="text-gray-500">(2x 1 unidade (24g) 102 kcals / 12 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">411.0 kcals / 68.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(2x 1 colher de servir arroz (90g) 148 kcals / 30 carbs)</span></li>
+                                
+                                    <li>Bolinho de carne <span class="text-gray-500">(2x 1 unidade (100g) 134 kcals / 16 carbs)</span></li>
+                                
+                                    <li>Bala 7 belo ® <span class="text-gray-500">(2x 1 unidade (10g) 40 kcals / 8 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(1x 1 concha média rasa (80g) 89 kcals / 14 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">3 de Setembro de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 1868.0 kcals / 272.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">37 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">08:15 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">307 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 9 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (43.0g / 15.0 = 3UI) + Correção (307mg/dL = 6UI) = 9UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">09:41 (Depois do café da manhã)</span><span class="font-bold text-gray-800 text-lg">293 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 293mg/dL = 6UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">12:02 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">197 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (49.0g / 15.0 = 3UI) + Correção (197mg/dL = 3UI) = 6UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">15:34 (Antes do lanche da tarde)</span><span class="font-bold text-gray-800 text-lg">236 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 11 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (101.0g / 15.0 = 7UI) + Correção (236mg/dL = 4UI) = 11UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">19:13 (Antes do jantar)</span><span class="font-bold text-gray-800 text-lg">89 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 5 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (79.0g / 15.0 = 5UI) + Correção (89mg/dL = 0UI) = 5UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">741.0 kcals / 79.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Queijo Muçarela <span class="text-gray-500">(3x 1 fatia média (60g) 195 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Ovo de galinha inteiro (cozido) <span class="text-gray-500">(1x 1 unidade média (45g) 71 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Pão francês <span class="text-gray-500">(1x 1 unidade (50g) 135 kcals / 29 carbs)</span></li>
+                                
+                                    <li>Biscoito de água e sal <span class="text-gray-500">(10x 1 unidade (80g) 340 kcals / 50 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">238.0 kcals / 43.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Biscoito de queijo <span class="text-gray-500">(1x 1 unidade (12g) 51 kcals / 6 carbs)</span></li>
+                                
+                                    <li>Biscoito de polvilho (rosquinha) <span class="text-gray-500">(4x 1 unidade (12g) 52 kcals / 8 carbs)</span></li>
+                                
+                                    <li>Pão francês <span class="text-gray-500">(1x 1 unidade (50g) 135 kcals / 29 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">331.0 kcals / 49.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Tutu de feijão <span class="text-gray-500">(1x 1 colher de servir cheia (60g) 92 kcals / 9 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(2x 1 colher de servir arroz (90g) 148 kcals / 30 carbs)</span></li>
+                                
+                                    <li>Alface, americana, crua <span class="text-gray-500">(3x 1 folha média (30g) 3 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Pé-de-moleque <span class="text-gray-500">(1x 1 unidade média (17g) 88 kcals / 10 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Lanche da tarde</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">558.0 kcals / 101.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Pão careca doce <span class="text-gray-500">(3x 1 unidade (150g) 402 kcals / 84 carbs)</span></li>
+                                
+                                    <li>Paçoca <span class="text-gray-500">(1x 1 unidade (32g) 156 kcals / 17 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">4 de Setembro de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 975.0 kcals / 144.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">24 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">07:59 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">122 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 5 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (66.0g / 15.0 = 4UI) + Correção (122mg/dL = 1UI) = 5UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">10:37 (Depois do café da manhã)</span><span class="font-bold text-gray-800 text-lg">339 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 7 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 339mg/dL = 7UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">12:01 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">261 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 10 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (78.0g / 15.0 = 5UI) + Correção (261mg/dL = 5UI) = 10UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">16:01 (Antes do lanche da tarde)</span><span class="font-bold text-gray-800 text-lg">167 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 2 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (0g / 15.0 = 0UI) + Correção (167mg/dL = 2UI) = 2UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">308.0 kcals / 66.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Achocolatado Diet Gold ® <span class="text-gray-500">(2x 1 colher de sopa (10g) 22 kcals / 6 carbs)</span></li>
+                                
+                                    <li>Bolo comum baunilha Dona Benta ® <span class="text-gray-500">(2x 1 fatia média (120g) 286 kcals / 60 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">667.0 kcals / 78.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Coxa de frango assada <span class="text-gray-500">(1x 1 unidade grande (55g) 118 kcals / 0 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(2x 1 colher de servir arroz (90g) 148 kcals / 30 carbs)</span></li>
+                                
+                                    <li>Paçoca <span class="text-gray-500">(2x 1 unidade (64g) 312 kcals / 34 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(1x 1 concha média rasa (80g) 89 kcals / 14 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">5 de Setembro de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 634.0 kcals / 124.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">0 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">380.0 kcals / 81.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Bolo comum baunilha Dona Benta ® <span class="text-gray-500">(150 gramas 358 kcals / 75 carbs)</span></li>
+                                
+                                    <li>Achocolatado Diet Gold ® <span class="text-gray-500">(2x 1 colher de sopa (10g) 22 kcals / 6 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">326.0 kcals / 58.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(2x 1 colher de servir arroz (90g) 148 kcals / 30 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(2x 1 concha média rasa (160g) 178 kcals / 28 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">6 de Setembro de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 929.0 kcals / 155.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">16 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">10:02 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">136 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 8 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (90.0g / 15.0 = 6UI) + Correção (136mg/dL = 2UI) = 8UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">12:07 (Depois do café da manhã)</span><span class="font-bold text-gray-800 text-lg">105 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 1 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 105mg/dL = 1UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">14:03 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">165 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 7 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (69.0g / 15.0 = 5UI) + Correção (165mg/dL = 2UI) = 7UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">429.0 kcals / 90.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Bolo comum baunilha Dona Benta ® <span class="text-gray-500">(3x 1 fatia média (180g) 429 kcals / 90 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">522.0 kcals / 69.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Batata frita chips <span class="text-gray-500">(1x 1 punhado (13g) 70 kcals / 6 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(3x 1 colher de servir arroz (135g) 222 kcals / 45 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(100 gramas 111 kcals / 18 carbs)</span></li>
+                                
+                                    <li>Frango frito <span class="text-gray-500">(1x 1 coxa média (49g) 119 kcals / 0 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">8 de Setembro de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 1414.0 kcals / 221.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">42 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">08:01 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">155 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (60.0g / 15.0 = 4UI) + Correção (155mg/dL = 2UI) = 6UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">10:34 (Extra)</span><span class="font-bold text-gray-800 text-lg">365 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 8 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (0g / 15.0 = 0UI) + Correção (365mg/dL = 8UI) = 8UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">12:46 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">334 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 10 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (43.0g / 15.0 = 3UI) + Correção (334mg/dL = 7UI) = 10UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">15:56 (Antes do lanche da tarde)</span><span class="font-bold text-gray-800 text-lg">236 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 8 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (60.0g / 15.0 = 4UI) + Correção (236mg/dL = 4UI) = 8UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">17:16 (Extra)</span><span class="font-bold text-gray-800 text-lg">298 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (0g / 15.0 = 0UI) + Correção (298mg/dL = 6UI) = 6UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">22:50 (Antes do jantar)</span><span class="font-bold text-gray-800 text-lg">86 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 4 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (58.0g / 15.0 = 4UI) + Correção (86mg/dL = 0UI) = 4UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">468.0 kcals / 58.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(2x 1 colher de servir arroz (90g) 148 kcals / 30 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(2x 1 concha média rasa (160g) 178 kcals / 28 carbs)</span></li>
+                                
+                                    <li>Ovo de galinha inteiro (cozido) <span class="text-gray-500">(2x 1 unidade média (90g) 142 kcals / 0 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Lanche da tarde</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">310.0 kcals / 60.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Pão de forma branco <span class="text-gray-500">(5x 1 fatia (125g) 310 kcals / 60 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">228.0 kcals / 43.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(1x 1 colher de sopa cheia (17g) 19 kcals / 3 carbs)</span></li>
+                                
+                                    <li>Macarrão à bolonhesa <span class="text-gray-500">(1x 1 escumadeira cheia (110g) 135 kcals / 25 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(1x 1 colher de servir arroz (45g) 74 kcals / 15 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">408.0 kcals / 60.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Biscoito de água e sal <span class="text-gray-500">(12x 1 unidade (96g) 408 kcals / 60 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pdf-page mb-8">
+                <div class="bg-white p-4 rounded-t-lg shadow-md border-b flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">9 de Setembro de 2025</h3>
+                        <p class="text-sm text-gray-500">Total: 2381.0 kcals / 313.0g carbs</p>
+                    </div>
+                    <div class="text-right"><h4 class="font-bold text-lg text-blue-700">Total Insulina do Dia</h4><p class="font-bold text-2xl text-blue-700">44 UI</p></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 p-4 bg-gray-50 rounded-b-lg shadow-md pdf-day-container">
+                    <div class="lg:col-span-2 pdf-day-glicemias">
+                        <h4 class="font-semibold mb-2 text-lg">Glicemias e Doses</h4>
+                        <ul class="space-y-3">
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">07:57 (Antes do café da manhã)</span><span class="font-bold text-gray-800 text-lg">242 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 7 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (37.0g / 15.0 = 2UI) + Correção (242mg/dL = 5UI) = 7UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">10:30 (Depois do café da manhã)</span><span class="font-bold text-gray-800 text-lg">306 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 306mg/dL = 6UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">12:44 (Antes do almoço)</span><span class="font-bold text-gray-800 text-lg">197 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 8 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (75.0g / 15.0 = 5UI) + Correção (197mg/dL = 3UI) = 8UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">15:43 (Antes do lanche da tarde)</span><span class="font-bold text-gray-800 text-lg">129 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 4 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (52.0g / 15.0 = 3UI) + Correção (129mg/dL = 1UI) = 4UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">19:35 (Depois do lanche da tarde)</span><span class="font-bold text-gray-800 text-lg">117 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 1 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 117mg/dL = 1UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-green-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">21:12 (Antes do jantar)</span><span class="font-bold text-gray-800 text-lg">143 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 12 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Carbs (149.0g / 15.0 = 10UI) + Correção (143mg/dL = 2UI) = 12UI</p></div>
+                            </li>
+                        
+                            <li class="p-3 rounded-lg  bg-red-100 ">
+                                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">23:58 (Depois do jantar)</span><span class="font-bold text-gray-800 text-lg">280 mg/dL</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-300/50"><p class="font-bold text-blue-800">Dose Sugerida: 6 UI</p><p class="text-xs text-gray-500 italic">Cálculo: Correção para 280mg/dL = 6UI</p></div>
+                            </li>
+                        
+                        </ul>
+                    </div>
+                    <div class="lg:col-span-3 pdf-day-refeicoes">
+                         <h4 class="font-semibold mb-2 text-lg">Refeições e Alimentos</h4>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Café da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">265.0 kcals / 37.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Achocolatado Diet Gold ® <span class="text-gray-500">(2x 1 colher de sopa (10g) 22 kcals / 6 carbs)</span></li>
+                                
+                                    <li>Pão francês <span class="text-gray-500">(1x 1 unidade (50g) 135 kcals / 29 carbs)</span></li>
+                                
+                                    <li>Requeijão cremoso Light <span class="text-gray-500">(2x 1 colher de sopa cheia (60g) 108 kcals / 2 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Jantar</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">802.0 kcals / 149.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(50 gramas 82 kcals / 17 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(40 gramas 45 kcals / 7 carbs)</span></li>
+                                
+                                    <li>Macarrão à bolonhesa <span class="text-gray-500">(5x 1 escumadeira cheia (550g) 675 kcals / 125 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Lanche da tarde</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">656.0 kcals / 52.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Torrada de pão francês caseira <span class="text-gray-500">(8x 1 unidade (64g) 232 kcals / 48 carbs)</span></li>
+                                
+                                    <li>Requeijão comum cremoso (média padrão) <span class="text-gray-500">(4x 1 colher de sopa cheia (120g) 424 kcals / 4 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Almoço</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">438.0 kcals / 75.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Suco de abacaxi com açúcar <span class="text-gray-500">(200 gramas 93 kcals / 23 carbs)</span></li>
+                                
+                                    <li>Paçoca <span class="text-gray-500">(1x 1 unidade (32g) 156 kcals / 17 carbs)</span></li>
+                                
+                                    <li>Beterraba cozida (picada) <span class="text-gray-500">(2x 1 colher de sopa cheia (40g) 18 kcals / 4 carbs)</span></li>
+                                
+                                    <li>Cenoura cozida <span class="text-gray-500">(1x 1 Colher de Sopa (25g) 8 kcals / 2 carbs)</span></li>
+                                
+                                    <li>Arroz branco cozido <span class="text-gray-500">(1x 1 colher de servir arroz (45g) 74 kcals / 15 carbs)</span></li>
+                                
+                                    <li>Feijão carioquinha cozido <span class="text-gray-500">(1x 1 concha média rasa (80g) 89 kcals / 14 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                            <div class="mb-4 bg-white p-3 rounded-md shadow-sm">
+                                <p class="font-bold text-md text-gray-700">Lanche da manhã</p>
+                                <p class="text-xs text-gray-500 -mt-1 mb-2">328.0 kcals / 26.0g carbs</p>
+                                <ul class="list-disc list-inside text-sm space-y-1 text-gray-600 pl-2">
+                                
+                                    <li>Torrada de pão francês caseira <span class="text-gray-500">(4x 1 unidade (32g) 116 kcals / 24 carbs)</span></li>
+                                
+                                    <li>Requeijão comum cremoso (média padrão) <span class="text-gray-500">(2x 1 colher de sopa cheia (60g) 212 kcals / 2 carbs)</span></li>
+                                
+                                </ul>
+                            </div>
+                         
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+    </div>
+    <script>
+        let glucoseChartInstance;
+
+        async function saveReportToServer(button) {
+            const originalText = button.innerHTML;
+            button.innerHTML = 'Salvando...';
+            button.disabled = true;
+
+            const filename = "relatorio_glicemico_cleiton_25-08-25 - 09-09-25.html";
+            const htmlContent = document.documentElement.outerHTML;
+
+            try {
+                const response = await fetch('/save-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filename: filename,
+                        html_content: htmlContent
+                    })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                } else {
+                    throw new Error(data.message || 'Ocorreu um erro desconhecido.');
+                }
+            } catch (error) {
+                console.error('Erro ao salvar o relatório:', error);
+                alert('Falha ao salvar o relatório: ' + error.message);
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        function exportToPDF() {
+            const element = document.getElementById('report-content');
+            const patientName = "Cleiton".replace(/\s+/g, '_').toLowerCase();
+            const period = "25/08/25 - 09/09/25".replace(/\s*\/\s*/g, '-').replace(/\s/g, '');
+            const filename = `relatorio_glicemico_${patientName}_${period}.pdf`;
+            const elementForPdf = element.cloneNode(true);
+            const pdfHeader = elementForPdf.querySelector('#pdf-header');
+            if (pdfHeader) {
+                pdfHeader.classList.remove('hidden');
+            }
+            if (glucoseChartInstance) {
+                const imageURL = glucoseChartInstance.toBase64Image('image/jpeg', 1.0);
+                const canvasInClone = elementForPdf.querySelector('#glucoseChart');
+                if (canvasInClone) {
+                    const img = document.createElement('img');
+                    img.src = imageURL;
+                    img.style.width = '100%';
+                    img.style.height = 'auto';
+                    canvasInClone.parentNode.replaceChild(img, canvasInClone);
+                }
+            }
+            const opt = { margin: 5, filename: filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, letterRendering: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }, pagebreak: { mode: 'css', before: '.pdf-page' } };
+            html2pdf().from(elementForPdf).set(opt).save();
+        }
+
+        const ctx = document.getElementById('glucoseChart');
+        if (ctx) {
+            const chartData = {"labels": ["25 08:16", "25 12:05", "25 20:06", "25 22:42", "25 23:60", "26 07:31", "26 11:24", "26 12:39", "26 15:58", "26 19:45", "26 22:13", "27 07:39", "27 09:15", "27 12:10", "27 15:29", "27 19:25", "27 22:44", "27 23:60", "28 20:20", "29 08:15", "29 12:58", "29 22:16", "30 09:23", "30 15:05", "30 23:01", "31 08:20", "31 13:46", "31 17:34", "31 19:29", "31 23:37", "31 23:56", "1 08:08", "1 12:51", "1 18:34", "2 07:44", "2 12:15", "2 17:07", "2 23:34", "3 08:15", "3 09:41", "3 12:02", "3 15:34", "3 19:13", "4 07:59", "4 10:37", "4 12:01", "4 16:01", "6 10:02", "6 12:07", "6 14:03", "8 08:01", "8 10:34", "8 12:46", "8 15:56", "8 17:16", "8 22:50", "9 07:57", "9 10:30", "9 12:44", "9 15:43", "9 19:35", "9 21:12", "9 23:58"], "data": [214, 260, 109, 253, 225, 102, 178, 201, 282, 116, 245, 88, 252, 216, 183, 189, 146, 208, 210, 130, 207, 67, 108, 63, 193, 170, 198, 155, 257, 78, 234, 83, 223, 332, 151, 358, 297, 61, 307, 293, 197, 236, 89, 122, 339, 261, 167, 136, 105, 165, 155, 365, 334, 236, 298, 86, 242, 306, 197, 129, 117, 143, 280]};
+            if (window.glucoseChartInstance) {
+                window.glucoseChartInstance.destroy();
+            }
+            window.glucoseChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Glicemia (mg/dL)',
+                        data: chartData.data,
+                        borderColor: 'rgb(29, 78, 216)',
+                        backgroundColor: 'rgba(29, 78, 216, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: 'rgb(29, 78, 216)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    animation: false, 
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: false, title: { display: true, text: 'Glicemia (mg/dL)' } }, x: { ticks: { autoSkip: true, maxRotation: 70, minRotation: 45 } } }
+                }
+            });
+        }
+    </script>
+
+<div id="cbfx3lhymf" style="display: block;"></div></body></html>

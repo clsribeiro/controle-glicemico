@@ -4,9 +4,9 @@
 # Aplicativo Web Dinâmico para Análise Glicêmica e Cálculo de Insulina
 #
 # Autor: Seu Especialista em IA
-# Descrição: Este aplicativo Flask permite o upload de um relatório .mhtml,
-#            extrai os dados e gera uma página de relatório interativa.
-#            -- MODIFICADO para incluir um botão de download do relatório HTML. --
+# Descrição: Este aplicativo Flask gera um relatório web interativo. O relatório
+#            inclui um botão que, ao ser clicado, envia o conteúdo da página
+#            de volta para o servidor para ser salvo na pasta 'relatorios/'.
 #
 # Como usar:
 # 1. Instale as dependências: pip install Flask beautifulsoup4
@@ -14,7 +14,7 @@
 # 3. Abra seu navegador e acesse: http://127.0.0.1:5000
 # -----------------------------------------------------------------------------
 
-from flask import Flask, render_template_string, request, redirect, url_for, flash
+from flask import Flask, render_template_string, request, redirect, url_for, flash, jsonify
 import statistics
 import re
 from bs4 import BeautifulSoup
@@ -22,9 +22,10 @@ import quopri
 import email
 from email.message import Message
 import json
+import os
 
 app = Flask(__name__)
-app.secret_key = 'super-secret-key' # Necessário para usar flash messages
+app.secret_key = 'super-secret-key'
 
 # --- Módulo de Cálculo de Insulina ---
 def get_default_correction_table():
@@ -36,7 +37,6 @@ def get_default_correction_table():
 def calcular_dose_correcao(glicemia, correction_table):
     """Calcula a dose de correção de insulina com base na glicemia e na tabela de correção."""
     if glicemia < 101: return 0
-    
     for range_str, dose in correction_table.items():
         if '+' in range_str:
             limit = int(range_str.replace('+', ''))
@@ -54,20 +54,16 @@ def calcular_dose_insulina(glicemia, carbs=0.0, tipo_medicao="", carb_ratio=15, 
     """
     if correction_table is None:
         correction_table = get_default_correction_table()
-
     dose_carboidratos = 0
     if 'antes' in tipo_medicao.lower() and carbs > 0 and carb_ratio > 0:
         dose_carboidratos = round(carbs / carb_ratio)
-
     dose_correcao = calcular_dose_correcao(glicemia['valor'], correction_table)
-    
     if 'depois' in tipo_medicao.lower():
         glicemia['dose_sugerida'] = dose_correcao
         glicemia['calculo'] = f"Correção para {glicemia['valor']}mg/dL = {dose_correcao}UI"
     else:
         glicemia['dose_sugerida'] = dose_carboidratos + dose_correcao
         glicemia['calculo'] = f"Carbs ({carbs}g / {carb_ratio} = {dose_carboidratos}UI) + Correção ({glicemia['valor']}mg/dL = {dose_correcao}UI) = {glicemia['dose_sugerida']}UI"
-    
     return glicemia
 
 # --- Módulo de Extração e Processamento de Dados ---
@@ -78,37 +74,25 @@ def parse_mhtml(file_storage, patient_name, carb_ratio, correction_table):
     try:
         msg = email.message_from_bytes(file_storage.read())
         html_part = next((part for part in msg.walk() if part.get_content_type() == "text/html"), None)
-        
         if not html_part:
             return None, "Não foi possível encontrar o conteúdo HTML no arquivo."
-
         charset = html_part.get_content_charset() or 'utf-8'
         html_content_quoted = html_part.get_payload(decode=False)
         html_content_bytes = quopri.decodestring(html_content_quoted)
         html = html_content_bytes.decode(charset)
         soup = BeautifulSoup(html, 'html.parser')
-        
-        dados = {
-            "paciente": patient_name,
-            "periodo": soup.find('h2').text.replace('Relatório: ', ''),
-            "dias": []
-        }
-        
+        dados = {"paciente": patient_name, "periodo": soup.find('h2').text.replace('Relatório: ', ''), "dias": []}
         dias_html = soup.find_all('h1', class_='font-bold text-xl')
-        
         for dia_h1 in dias_html:
             dia_container = dia_h1.parent
             dia_data = {"data": dia_h1.text, "total_kcal": 0, "total_carbs": 0, "glicemias": [], "refeicoes": []}
-            
             p_total = dia_h1.find_next_sibling('p')
             if p_total and (match := re.search(r'([\d\.]+) kcals / ([\d\.]+) carbs', p_total.text)):
                 dia_data["total_kcal"], dia_data["total_carbs"] = map(float, match.groups())
-
             cards = dia_container.find_next_siblings('div', class_='rounded')
             for card in cards:
                 if not (card_title_element := card.find('div', class_='font-bold text-lg')): continue
                 card_title = card_title_element.text.strip()
-                
                 if card_title == 'Glicemias':
                     for p in card.find_all('p', class_='text-gray-500'):
                         if (tipo_element := p.find_previous_sibling('p')) and (match := re.search(r'(\d{2}:\d{2}): (\d+) mg/dl', p.text)):
@@ -117,15 +101,11 @@ def parse_mhtml(file_storage, patient_name, carb_ratio, correction_table):
                     refeicao = {"nome": card_title, "total_kcal": 0, "total_carbs": 0, "alimentos": []}
                     if (details_div := card.find('div', class_='text-sm text-gray-500')) and (match := re.search(r'([\d\.]+) kcals / ([\d\.]+) carbs', details_div.text)):
                         refeicao['total_kcal'], refeicao['total_carbs'] = map(float, match.groups())
-                    
                     for alimento_p in card.select('.p-4 > div > div > p.font-bold'):
                         nome_alimento = alimento_p.text
                         detalhes_div = alimento_p.find_next_sibling('div')
-                        if detalhes_div:
-                            refeicao['alimentos'].append({"nome": nome_alimento, "detalhes": " ".join(detalhes_div.stripped_strings)})
-                    
+                        if detalhes_div: refeicao['alimentos'].append({"nome": nome_alimento, "detalhes": " ".join(detalhes_div.stripped_strings)})
                     dia_data['refeicoes'].append(refeicao)
-            
             total_insulina_dia = 0
             for glicemia in dia_data['glicemias']:
                 tipo_medicao = glicemia.get('tipo', '').lower()
@@ -140,91 +120,79 @@ def parse_mhtml(file_storage, patient_name, carb_ratio, correction_table):
                     refeicao_alvo = next((r for r in dia_data['refeicoes'] if 'Lanche' in r['nome']), None)
                 else:
                     refeicao_alvo = None
-                
                 if refeicao_alvo:
                     carbs_refeicao = refeicao_alvo['total_carbs']
-                
                 calcular_dose_insulina(glicemia, carbs_refeicao, tipo_medicao, carb_ratio, correction_table)
                 total_insulina_dia += glicemia.get('dose_sugerida', 0)
-            
             dia_data['total_insulina'] = total_insulina_dia
             dados['dias'].append(dia_data)
-        
         dados['total_dias'] = len(dados['dias'])
         return dados, None
     except Exception as e:
-        return None, f"Ocorreu um erro ao processar o arquivo. Verifique se o formato está correto. Detalhe: {str(e)}"
+        return None, f"Ocorreu um erro ao processar o arquivo. Detalhe: {str(e)}"
 
 def analisar_dados_gerais(dados_completos):
     todas_as_glicemias = [g['valor'] for dia in dados_completos.get('dias', []) for g in dia.get('glicemias', [])]
     if not todas_as_glicemias: return {}
     total = len(todas_as_glicemias)
     glicemia_media = statistics.mean(todas_as_glicemias)
-    return {
-        "glicemia_media": round(glicemia_media),
-        "glicemia_max": max(todas_as_glicemias),
-        "glicemia_min": min(todas_as_glicemias),
-        "desvio_padrao": round(statistics.stdev(todas_as_glicemias), 1) if total > 1 else 0,
-        "hba1c_estimada": round((glicemia_media + 46.7) / 28.7, 1),
-        "tempo_no_alvo": {
-            "no_alvo": round(sum(1 for g in todas_as_glicemias if 70 <= g <= 180) / total * 100),
-            "abaixo": round(sum(1 for g in todas_as_glicemias if g < 70) / total * 100),
-            "acima": round(sum(1 for g in todas_as_glicemias if g > 180) / total * 100)
-        }
-    }
+    return {"glicemia_media": round(glicemia_media), "glicemia_max": max(todas_as_glicemias), "glicemia_min": min(todas_as_glicemias), "desvio_padrao": round(statistics.stdev(todas_as_glicemias), 1) if total > 1 else 0, "hba1c_estimada": round((glicemia_media + 46.7) / 28.7, 1), "tempo_no_alvo": {"no_alvo": round(sum(1 for g in todas_as_glicemias if 70 <= g <= 180) / total * 100), "abaixo": round(sum(1 for g in todas_as_glicemias if g < 70) / total * 100), "acima": round(sum(1 for g in todas_as_glicemias if g > 180) / total * 100)}}
 
-# --- Rota Principal e Templates ---
+# --- Rota Principal para GERAR o Relatório ---
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
         if 'report_file' not in request.files or not request.files['report_file'].filename:
             flash('Nenhum arquivo selecionado.', 'error')
             return redirect(request.url)
-        
         file = request.files['report_file']
         patient_name = request.form.get('patient_name') or "Utilizador"
         carb_ratio = float(request.form.get('carb_ratio', 15))
         correction_table = {key.replace('correction_', ''): val for key, val in request.form.items() if key.startswith('correction_')}
-
         if file.filename.endswith('.mhtml'):
             dados, erro = parse_mhtml(file, patient_name, carb_ratio, correction_table)
             if erro:
                 flash(erro, 'error')
                 return redirect(request.url)
-            
             analise = analisar_dados_gerais(dados)
-            
-            chart_labels = []
-            chart_data_points = []
-            for dia in dados.get('dias', []):
-                for g in dia.get('glicemias', []):
-                    dia_label = dia['data'].split(' de ')[0]
-                    chart_labels.append(f"{dia_label} {g['hora']}")
-                    chart_data_points.append(g['valor'])
-
-            chart_data = { "labels": chart_labels, "data": chart_data_points }
-
-            # ### ALTERAÇÃO ### 
-            # Cria o nome do arquivo, mas não o salva no servidor.
-            # Apenas passa o nome para o template para que o JavaScript possa usá-lo.
+            chart_labels = [f"{dia['data'].split(' de ')[0]} {g['hora']}" for dia in dados.get('dias', []) for g in dia.get('glicemias', [])]
+            chart_data_points = [g['valor'] for dia in dados.get('dias', []) for g in dia.get('glicemias', [])]
+            chart_data = {"labels": chart_labels, "data": chart_data_points}
             paciente_safe = re.sub(r'[^a-z0-9_]', '', patient_name.lower().replace(' ', '_'))
             periodo_safe = dados.get("periodo", "periodo").replace(' a ', '_').replace('/', '-')
             filename_html = f"relatorio_glicemico_{paciente_safe}_{periodo_safe}.html"
-
             return render_template_string(
                 REPORT_TEMPLATE, 
                 dados=dados, 
                 analise=analise, 
-                chart_data=json.dumps(chart_data), 
-                calc_params={'ratio': carb_ratio, 'table': correction_table},
-                filename_html=filename_html # Passa o nome do arquivo para o template
+                chart_data=json.dumps(chart_data),
+                filename_html=filename_html
             )
         else:
             flash('Formato de arquivo inválido. Por favor, envie um arquivo .mhtml.', 'error')
             return redirect(request.url)
-
     return render_template_string(UPLOAD_TEMPLATE, correction_table=get_default_correction_table())
 
+# --- Rota para SALVAR o Relatório ---
+@app.route('/save-report', methods=['POST'])
+def save_report():
+    try:
+        data = request.get_json()
+        if not data or 'filename' not in data or 'html_content' not in data:
+            return jsonify({'status': 'error', 'message': 'Dados inválidos.'}), 400
+        filename = data['filename']
+        content = data['html_content']
+        output_dir = 'relatorios'
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        filepath = os.path.join(output_dir, filename)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(content)
+        return jsonify({'status': 'success', 'message': f'Relatório salvo com sucesso em: {filepath}'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# --- Templates HTML ---
 UPLOAD_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -241,18 +209,14 @@ UPLOAD_TEMPLATE = """
             <h1 class="text-3xl font-bold text-blue-700 mb-2">Analisador de Glicemia e Insulina</h1>
             <p class="text-gray-600">Configure os parâmetros de cálculo e carregue seu relatório (.mhtml).</p>
         </div>
-        
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
+            {% if messages %}{% for category, message in messages %}
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                     <strong class="font-bold">Erro:</strong>
                     <span class="block sm:inline">{{ message }}</span>
                 </div>
-                {% endfor %}
-            {% endif %}
+            {% endfor %}{% endif %}
         {% endwith %}
-
         <form action="/" method="post" enctype="multipart/form-data" class="space-y-8">
             <fieldset class="border rounded-lg p-4">
                 <legend class="text-lg font-medium text-gray-800 px-2">Parâmetros de Cálculo</legend>
@@ -278,7 +242,6 @@ UPLOAD_TEMPLATE = """
                     </div>
                 </div>
             </fieldset>
-
             <fieldset class="border rounded-lg p-4">
                 <legend class="text-lg font-medium text-gray-800 px-2">Arquivo do Relatório</legend>
                 <label for="report_file" class="relative block w-full mt-4 text-sm text-gray-700 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 p-6 text-center">
@@ -286,10 +249,7 @@ UPLOAD_TEMPLATE = """
                     <input type="file" name="report_file" id="report_file" class="hidden" accept=".mhtml" required>
                 </label>
             </fieldset>
-            
-            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors text-lg">
-                Analisar Relatório
-            </button>
+            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700">Analisar Relatório</button>
         </form>
     </div>
     <script>
@@ -298,9 +258,6 @@ UPLOAD_TEMPLATE = """
             if (this.files && this.files.length > 0) {
                 textEl.textContent = `Arquivo: ${this.files[0].name}`;
                 textEl.classList.replace('text-blue-600', 'text-green-600');
-            } else {
-                textEl.textContent = 'Clique para carregar ou arraste o arquivo .mhtml aqui';
-                textEl.classList.replace('text-green-600', 'text-blue-600');
             }
         });
     </script>
@@ -362,7 +319,7 @@ REPORT_TEMPLATE = """
             </div>
             <div class="flex gap-2">
                 <a href="/" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700">Carregar Novo</a>
-                <button onclick="saveAsHTML()" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">Salvar HTML</button>
+                <button onclick="saveReportToServer(this)" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">Salvar HTML no Servidor</button>
                 <button onclick="exportToPDF()" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Exportar para PDF</button>
             </div>
         </header>
@@ -455,43 +412,48 @@ REPORT_TEMPLATE = """
     <script>
         let glucoseChartInstance;
 
-        // ### ALTERAÇÃO ### - Nova função para salvar a página como um arquivo HTML
-        function saveAsHTML() {
-            // Usa o nome do arquivo passado pelo Python
+        async function saveReportToServer(button) {
+            const originalText = button.innerHTML;
+            button.innerHTML = 'Salvando...';
+            button.disabled = true;
+
             const filename = "{{ filename_html|safe }}";
+            const htmlContent = document.documentElement.outerHTML;
 
-            // Cria um "Blob" (um objeto tipo arquivo) com o conteúdo HTML da página atual
-            const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
-            
-            // Cria um link temporário na memória
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            
-            // Simula um clique no link para iniciar o download
-            document.body.appendChild(link);
-            link.click();
-            
-            // Limpa o link temporário da memória
-            document.body.removeChild(link);
-            URL.revokeObjectURL(link.href);
-
-            // Informa ao usuário que o download começou
-            alert('O download do arquivo "' + filename + '" foi iniciado.');
+            try {
+                const response = await fetch('/save-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filename: filename,
+                        html_content: htmlContent
+                    })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                } else {
+                    throw new Error(data.message || 'Ocorreu um erro desconhecido.');
+                }
+            } catch (error) {
+                console.error('Erro ao salvar o relatório:', error);
+                alert('Falha ao salvar o relatório: ' + error.message);
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
         }
-
+        
         function exportToPDF() {
             const element = document.getElementById('report-content');
             const patientName = "{{ dados.paciente }}".replace(/\\s+/g, '_').toLowerCase();
             const period = "{{ dados.periodo }}".replace(/\\s*\\/\\s*/g, '-').replace(/\\s/g, '');
             const filename = `relatorio_glicemico_${patientName}_${period}.pdf`;
-            
             const elementForPdf = element.cloneNode(true);
             const pdfHeader = elementForPdf.querySelector('#pdf-header');
             if (pdfHeader) {
                 pdfHeader.classList.remove('hidden');
             }
-
             if (glucoseChartInstance) {
                 const imageURL = glucoseChartInstance.toBase64Image('image/jpeg', 1.0);
                 const canvasInClone = elementForPdf.querySelector('#glucoseChart');
@@ -503,15 +465,7 @@ REPORT_TEMPLATE = """
                     canvasInClone.parentNode.replaceChild(img, canvasInClone);
                 }
             }
-
-            const opt = { 
-                margin: 5, 
-                filename: filename, 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, letterRendering: true }, 
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
-                pagebreak: { mode: 'css', before: '.pdf-page' }
-            };
+            const opt = { margin: 5, filename: filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, letterRendering: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }, pagebreak: { mode: 'css', before: '.pdf-page' } };
             html2pdf().from(elementForPdf).set(opt).save();
         }
 
@@ -550,6 +504,7 @@ REPORT_TEMPLATE = """
 </body>
 </html>
 """
+
 # --- Execução do Servidor ---
 if __name__ == '__main__':
     app.run(debug=True)
